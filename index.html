@@ -11,19 +11,52 @@
       padding: 20px;
       max-width: 600px;
       margin: auto;
+      position: relative;
     }
     h1 {
       text-align: center;
       display: flex;
       align-items: center;
       justify-content: center;
+      position: relative;
     }
     h1 button {
-      margin-left: 10px;
       font-size: 1.5em;
       padding: 0 10px;
       border: none;
       background: none;
+      cursor: pointer;
+    }
+    /* Style for the Add Item (+) button */
+    #toggleFormBtn {
+      margin-left: 10px;
+    }
+    /* Style for the hamburger button */
+    #hamburgerBtn {
+      margin-left: 10px;
+      font-size: 1.5em;
+    }
+    /* Hamburger menu container */
+    .hamburger-menu {
+      display: none;
+      position: absolute;
+      top: 50px; /* adjust as needed */
+      right: 20px; /* adjust as needed */
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 10px;
+      z-index: 1000;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .hamburger-menu button {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 10px 15px;
+      margin: 5px 0;
+      width: 100%;
       cursor: pointer;
     }
     form {
@@ -54,21 +87,13 @@
       margin-bottom: 20px;
       box-sizing: border-box;
     }
-    /* Style for export, import and share buttons */
-    #exportBtn, #importBtn, #shareBtn {
+    /* Share button remains below the search box */
+    #shareBtn {
       margin-bottom: 20px;
-      background-color: #3498db;
+      background-color: #f39c12;
       color: white;
       border: none;
       border-radius: 5px;
-    }
-    #importBtn {
-      margin-left: 10px;
-      background-color: #2ecc71;
-    }
-    #shareBtn {
-      margin-left: 10px;
-      background-color: #f39c12;
     }
     .item {
       border: 1px solid #ddd;
@@ -96,8 +121,8 @@
       body {
         padding: 10px;
       }
-      /* Remove left margin for import and share buttons on small screens */
-      #importBtn, #shareBtn {
+      /* Remove left margin for hamburger menu when on small screens */
+      #hamburgerBtn {
         margin-left: 0;
       }
     }
@@ -107,7 +132,15 @@
   <h1>
     Home Inventory 
     <button id="toggleFormBtn" type="button">+</button>
+    <button id="hamburgerBtn" type="button">&#9776;</button>
   </h1>
+  
+  <!-- Hamburger menu container -->
+  <div id="hamburgerMenu" class="hamburger-menu">
+    <button id="exportBtn">Export Records</button>
+    <button id="importBtn">Import Records</button>
+  </div>
+
   <form id="itemForm">
     <label for="name">Item Name:</label>
     <input type="text" id="name" required />
@@ -125,8 +158,7 @@
 
   <input type="text" id="searchBox" placeholder="Search items by name, description, or location..." />
   
-  <button id="exportBtn">Export Records</button>
-  <button id="importBtn">Import Records</button>
+  <!-- Share button stays outside the hamburger menu -->
   <button id="shareBtn">Share Records</button>
   <!-- Hidden file input for import -->
   <input type="file" id="importInput" accept="application/json" style="display:none;" />
@@ -141,12 +173,14 @@
     const form = document.getElementById('itemForm');
     const itemsContainer = document.getElementById('itemsContainer');
     const searchBox = document.getElementById('searchBox');
-    const exportBtn = document.getElementById('exportBtn');
-    const importBtn = document.getElementById('importBtn');
     const shareBtn = document.getElementById('shareBtn');
     const importInput = document.getElementById('importInput');
     const locationsList = document.getElementById('locationsList');
     const toggleFormBtn = document.getElementById('toggleFormBtn');
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
+    const hamburgerMenu = document.getElementById('hamburgerMenu');
+    const exportBtn = document.getElementById('exportBtn');
+    const importBtn = document.getElementById('importBtn');
 
     // Populate the datalist with stored locations.
     function updateLocationsList() {
@@ -234,11 +268,15 @@
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+      // Hide hamburger menu after clicking
+      hamburgerMenu.style.display = "none";
     });
 
     // Trigger the hidden file input when Import button is clicked.
     importBtn.addEventListener('click', function() {
       importInput.click();
+      // Hide hamburger menu after clicking
+      hamburgerMenu.style.display = "none";
     });
 
     // Process the selected file and merge imported records.
@@ -276,7 +314,6 @@
 
     // Share displayed records using the Web Share API.
     shareBtn.addEventListener('click', function() {
-      // Filter items based on the current search term.
       const searchTerm = searchBox.value.toLowerCase();
       const filteredItems = items.filter(item =>
         item.name.toLowerCase().includes(searchTerm) ||
@@ -284,7 +321,6 @@
         item.location.toLowerCase().includes(searchTerm)
       );
       
-      // Check if the Web Share API is supported.
       if (navigator.share) {
         navigator.share({
           title: 'Home Inventory Records',
@@ -300,17 +336,19 @@
     // Toggle form visibility when the + button is clicked.
     toggleFormBtn.addEventListener('click', function(e) {
       e.stopPropagation();
-      if (form.style.display === "none" || form.style.display === "") {
-        form.style.display = "block";
-      } else {
-        form.style.display = "none";
-      }
+      form.style.display = (form.style.display === "none" || form.style.display === "") ? "block" : "none";
     });
 
-    // Hide the form if clicked outside of it.
+    // Toggle hamburger menu visibility when its button is clicked.
+    hamburgerBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      hamburgerMenu.style.display = (hamburgerMenu.style.display === "none" || hamburgerMenu.style.display === "") ? "block" : "none";
+    });
+
+    // Hide the hamburger menu if clicked outside of it.
     document.addEventListener('click', function(e) {
-      if (form.style.display === "block" && !form.contains(e.target) && e.target !== toggleFormBtn) {
-        form.style.display = "none";
+      if (hamburgerMenu.style.display === "block" && !hamburgerMenu.contains(e.target) && e.target !== hamburgerBtn) {
+        hamburgerMenu.style.display = "none";
       }
     });
 
