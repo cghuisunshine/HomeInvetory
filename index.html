@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Home Inventory Prototype</title>
+  <title>Home Inventory Prototype with Search</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -34,11 +34,18 @@
       padding: 10px 15px;
       cursor: pointer;
     }
+    #searchBox {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 20px;
+      box-sizing: border-box;
+    }
     .item {
       border: 1px solid #ddd;
       padding: 10px;
       margin-bottom: 10px;
       border-radius: 5px;
+      position: relative;
     }
     .item strong {
       font-size: 1.1em;
@@ -49,7 +56,9 @@
       border: none;
       padding: 5px 10px;
       border-radius: 3px;
-      float: right;
+      position: absolute;
+      right: 10px;
+      top: 10px;
       cursor: pointer;
     }
   </style>
@@ -69,25 +78,35 @@
     <button type="submit">Add Item</button>
   </form>
 
+  <input type="text" id="searchBox" placeholder="Search items by name, description, or location..." />
+
   <div id="itemsContainer"></div>
 
   <script>
-    // Get saved items from localStorage, or use an empty array if none exist
+    // Retrieve saved items from localStorage or initialize an empty array.
     let items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
 
     const form = document.getElementById('itemForm');
     const itemsContainer = document.getElementById('itemsContainer');
+    const searchBox = document.getElementById('searchBox');
 
-    // Function to display the items on the page
+    // Display items, filtered by the search term if provided.
     function displayItems() {
+      const searchTerm = searchBox.value.toLowerCase();
+      const filteredItems = items.filter(item =>
+        item.name.toLowerCase().includes(searchTerm) ||
+        item.description.toLowerCase().includes(searchTerm) ||
+        item.location.toLowerCase().includes(searchTerm)
+      );
+      
       itemsContainer.innerHTML = '';
-      items.forEach((item, index) => {
+      filteredItems.forEach(item => {
         const itemDiv = document.createElement('div');
         itemDiv.className = 'item';
         itemDiv.innerHTML = `
-          <button onclick="deleteItem(${index})">Delete</button>
-          <strong>${item.name}</strong> <br>
-          <em>${item.location}</em> <br>
+          <button onclick="deleteItem(${item.id})">Delete</button>
+          <strong>${item.name}</strong><br>
+          <em>${item.location}</em><br>
           <p>${item.description}</p>
           <small>Added on: ${new Date(item.addedDate).toLocaleString()}</small>
         `;
@@ -95,18 +114,18 @@
       });
     }
 
-    // Function to delete an item by its index
-    function deleteItem(index) {
-      items.splice(index, 1);
+    // Delete an item using its unique ID.
+    function deleteItem(id) {
+      items = items.filter(item => item.id !== id);
       localStorage.setItem('inventoryItems', JSON.stringify(items));
       displayItems();
     }
 
-    // Handle the form submission to add a new item
+    // Handle form submission to add a new item.
     form.addEventListener('submit', function(e) {
       e.preventDefault();
-
       const newItem = {
+        id: Date.now(), // Use timestamp as a simple unique ID.
         name: document.getElementById('name').value,
         description: document.getElementById('description').value,
         location: document.getElementById('location').value,
@@ -119,7 +138,10 @@
       displayItems();
     });
 
-    // Display any stored items on page load
+    // Update the displayed items as the search query changes.
+    searchBox.addEventListener('input', displayItems);
+
+    // Show items on page load.
     displayItems();
   </script>
 </body>
