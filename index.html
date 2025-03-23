@@ -14,12 +14,24 @@
     }
     h1 {
       text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    h1 button {
+      margin-left: 10px;
+      font-size: 1.5em;
+      padding: 0 10px;
+      border: none;
+      background: none;
+      cursor: pointer;
     }
     form {
       margin-bottom: 20px;
       border: 1px solid #ccc;
       padding: 15px;
       border-radius: 5px;
+      display: none; /* folded by default */
     }
     label {
       display: block;
@@ -92,7 +104,10 @@
   </style>
 </head>
 <body>
-  <h1>Home Inventory</h1>
+  <h1>
+    Home Inventory 
+    <button id="toggleFormBtn" type="button">+</button>
+  </h1>
   <form id="itemForm">
     <label for="name">Item Name:</label>
     <input type="text" id="name" required />
@@ -131,6 +146,7 @@
     const shareBtn = document.getElementById('shareBtn');
     const importInput = document.getElementById('importInput');
     const locationsList = document.getElementById('locationsList');
+    const toggleFormBtn = document.getElementById('toggleFormBtn');
 
     // Populate the datalist with stored locations.
     function updateLocationsList() {
@@ -199,6 +215,8 @@
       localStorage.setItem('inventoryItems', JSON.stringify(items));
       form.reset();
       displayItems();
+      // Automatically fold (hide) the form after submission.
+      form.style.display = "none";
     });
 
     // Update displayed items as the search query changes.
@@ -277,6 +295,28 @@
       } else {
         alert('Web Share API is not supported in your browser.');
       }
+    });
+
+    // Toggle form visibility when the + button is clicked.
+    toggleFormBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (form.style.display === "none" || form.style.display === "") {
+        form.style.display = "block";
+      } else {
+        form.style.display = "none";
+      }
+    });
+
+    // Hide the form if clicked outside of it.
+    document.addEventListener('click', function(e) {
+      if (form.style.display === "block" && !form.contains(e.target) && e.target !== toggleFormBtn) {
+        form.style.display = "none";
+      }
+    });
+
+    // Prevent clicks inside the form from closing it.
+    form.addEventListener('click', function(e) {
+      e.stopPropagation();
     });
 
     // Show items and update locations list on page load.
