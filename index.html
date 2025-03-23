@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Home Inventory Prototype</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+    }
+    h1 {
+      text-align: center;
+    }
+    form {
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      padding: 15px;
+      border-radius: 5px;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px 15px;
+      cursor: pointer;
+    }
+    .item {
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+    }
+    .item strong {
+      font-size: 1.1em;
+    }
+    .item button {
+      background-color: #e74c3c;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 3px;
+      float: right;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Home Inventory Prototype</h1>
+  <form id="itemForm">
+    <label for="name">Item Name:</label>
+    <input type="text" id="name" required />
+
+    <label for="description">Description:</label>
+    <textarea id="description" rows="3"></textarea>
+
+    <label for="location">Location:</label>
+    <input type="text" id="location" required />
+
+    <button type="submit">Add Item</button>
+  </form>
+
+  <div id="itemsContainer"></div>
+
+  <script>
+    // Get saved items from localStorage, or use an empty array if none exist
+    let items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
+
+    const form = document.getElementById('itemForm');
+    const itemsContainer = document.getElementById('itemsContainer');
+
+    // Function to display the items on the page
+    function displayItems() {
+      itemsContainer.innerHTML = '';
+      items.forEach((item, index) => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'item';
+        itemDiv.innerHTML = `
+          <button onclick="deleteItem(${index})">Delete</button>
+          <strong>${item.name}</strong> <br>
+          <em>${item.location}</em> <br>
+          <p>${item.description}</p>
+          <small>Added on: ${new Date(item.addedDate).toLocaleString()}</small>
+        `;
+        itemsContainer.appendChild(itemDiv);
+      });
+    }
+
+    // Function to delete an item by its index
+    function deleteItem(index) {
+      items.splice(index, 1);
+      localStorage.setItem('inventoryItems', JSON.stringify(items));
+      displayItems();
+    }
+
+    // Handle the form submission to add a new item
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const newItem = {
+        name: document.getElementById('name').value,
+        description: document.getElementById('description').value,
+        location: document.getElementById('location').value,
+        addedDate: new Date().toISOString()
+      };
+
+      items.push(newItem);
+      localStorage.setItem('inventoryItems', JSON.stringify(items));
+      form.reset();
+      displayItems();
+    });
+
+    // Display any stored items on page load
+    displayItems();
+  </script>
+</body>
+</html>
+
