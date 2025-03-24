@@ -135,6 +135,21 @@
         margin-left: 0;
       }
     }
+    /* Styles for the Paste JSON modal */
+    #pasteModal {
+      display: none; 
+      position: fixed; 
+      top: 50%; 
+      left: 50%; 
+      transform: translate(-50%, -50%);
+      background: #fff; 
+      border: 1px solid #ccc; 
+      padding: 20px; 
+      z-index: 2000; 
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      max-width: 90%;
+      width: 400px;
+    }
   </style>
 </head>
 <body>
@@ -148,6 +163,7 @@
   <div id="hamburgerMenu" class="hamburger-menu">
     <button id="exportBtn">Export Records</button>
     <button id="importBtn">Import Records</button>
+    <button id="pasteBtn">Paste Records</button>
   </div>
 
   <form id="itemForm">
@@ -173,6 +189,15 @@
   <input type="file" id="importInput" accept="application/json" style="display:none;" />
 
   <div id="itemsContainer"></div>
+
+  <!-- Paste JSON Modal -->
+  <div id="pasteModal">
+    <h3>Paste JSON Records</h3>
+    <textarea id="pasteJsonInput" rows="10" style="width: 100%;"></textarea>
+    <br>
+    <button id="pasteImportBtn">Import JSON</button>
+    <button id="closeModalBtn">Close</button>
+  </div>
 
   <script>
     // Retrieve saved items and locations from localStorage or initialize empty arrays.
@@ -300,7 +325,7 @@
       hamburgerMenu.style.display = "none";
     });
 
-    // Trigger the hidden file input when Import button is clicked.
+    // Trigger the hidden file input when Import Records button is clicked.
     importBtn.addEventListener('click', function() {
       importInput.click();
       // Hide hamburger menu after clicking.
@@ -315,6 +340,7 @@
       const reader = new FileReader();
       reader.onload = function(event) {
         try {
+          // Directly parse file content (expected to be valid JSON).
           const importedItems = JSON.parse(event.target.result);
           // Merge imported items (skip duplicates based on id)
           importedItems.forEach(importedItem => {
@@ -383,6 +409,75 @@
     // Prevent clicks inside the form from closing it.
     form.addEventListener('click', function(e) {
       e.stopPropagation();
+    });
+
+    // Helper function to extract a valid JSON substring from a string.
+    function extractValidJSON(text) {
+      // Look for the first occurrence of '[' and the last occurrence of ']'
+      let start = text.indexOf('[');
+      let end = text.lastIndexOf(']');
+      if (start !== -1 && end !== -1 && end > start) {
+        return text.substring(start, end + 1);
+      }
+      // If not found, try for an object
+      start = text.indexOf('{');
+      end = text.lastIndexOf('}');
+      if (start !== -1 && end !== -1 && end > start) {
+        return text.substring(start, end + 1);
+      }
+      return null;
+    }
+
+    // Get modal elements for pasted JSON.
+    const pasteModal = document.getElementById('pasteModal');
+    const pasteJsonInput = document.getElementById('pasteJsonInput');
+    const pasteImportBtn = document.getElementById('pasteImportBtn');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const pasteBtn = document.getElementById('pasteBtn');
+
+    // Show the modal when Paste JSON button is clicked.
+    pasteBtn.addEventListener('click', function() {
+      pasteModal.style.display = "block";
+      hamburgerMenu.style.display = "none"; // Hide hamburger menu if open.
+    });
+
+    // When the user clicks the Import JSON button in the modal.
+    pasteImportBtn.addEventListener('click', function() {
+      let pastedText = pasteJsonInput.value;
+      // Extract valid JSON substring.
+      let jsonText = extractValidJSON(pastedText);
+      if (!jsonText) {
+        alert("No valid JSON found in the input.");
+        return;
+      }
+      try {
+        const importedItems = JSON.parse(jsonText);
+        // Merge imported items (skip duplicates based on id)
+        importedItems.forEach(importedItem => {
+          if (!items.find(item => item.id === importedItem.id)) {
+            items.push(importedItem);
+            // Also add the location if it's not already in our locations list.
+            if (importedItem.location && !locations.includes(importedItem.location)) {
+              locations.push(importedItem.location);
+            }
+          }
+        });
+        localStorage.setItem('inventoryItems', JSON.stringify(items));
+        localStorage.setItem('inventoryLocations', JSON.stringify(locations));
+        updateLocationsList();
+        displayItems();
+        alert("Records imported successfully!");
+        pasteModal.style.display = "none"; // Close modal on success.
+        pasteJsonInput.value = ""; // Clear textarea.
+      } catch (error) {
+        alert("Failed to import records: Invalid JSON format.");
+      }
+    });
+
+    // Close the modal when the Close button is clicked.
+    closeModalBtn.addEventListener('click', function() {
+      pasteModal.style.display = "none";
+      pasteJsonInput.value = ""; // Clear the textarea.
     });
 
     // Show items and update locations list on page load.
