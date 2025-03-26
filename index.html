@@ -3,15 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <!-- Ensures proper scaling on mobile devices -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Home Inventory</title>
   <style>
+    html, body {
+      height: 100%;
+    }
     body {
       font-family: Arial, sans-serif;
       padding: 20px;
       max-width: 600px;
       margin: auto;
       position: relative;
+      /* Use the CSS variable to set the height */
+      height: calc(var(--vh, 1vh) * 100);
     }
     h1 {
       text-align: center;
@@ -209,6 +214,14 @@
   </div>
 
   <script>
+    // Set CSS variable for viewport height to handle mobile keyboards.
+    function setVh() {
+      let vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
+    }
+    window.addEventListener('resize', setVh);
+    setVh();
+
     // Utility: Get today's date with time reset.
     function getToday() {
       const now = new Date();
