@@ -178,6 +178,10 @@
     <input type="text" id="location" list="locationsList" required />
     <datalist id="locationsList"></datalist>
 
+    <!-- Optional Expire Date field with a date picker -->
+    <label for="expireDate">Expire Date (optional):</label>
+    <input type="date" id="expireDate" />
+
     <button type="submit">Add Item</button>
   </form>
 
@@ -263,6 +267,7 @@
             <em>${item.location}</em><br>
             <p>${item.description}</p>
             <small>Added on: ${new Date(item.addedDate).toLocaleString()}</small>
+            ${item.expireDate ? `<br><small>Expires on: ${new Date(item.expireDate).toLocaleDateString()}</small>` : ''}
           `;
           itemsContainer.appendChild(itemDiv);
         });
@@ -282,13 +287,15 @@
       const itemName = document.getElementById('name').value;
       const itemDescription = document.getElementById('description').value;
       const itemLocation = document.getElementById('location').value;
+      const itemExpireDate = document.getElementById('expireDate').value;
 
       const newItem = {
         id: Date.now(), // Use timestamp as a simple unique ID.
         name: itemName,
         description: itemDescription,
         location: itemLocation,
-        addedDate: new Date().toISOString()
+        addedDate: new Date().toISOString(),
+        expireDate: itemExpireDate ? new Date(itemExpireDate).toISOString() : null
       };
 
       // If the location is new, add it to the locations array.
