@@ -87,13 +87,16 @@
       margin-bottom: 20px;
       box-sizing: border-box;
     }
-    /* Share button remains below the search box */
-    #shareBtn {
+    /* Share and Show Expires buttons styling */
+    #shareBtn, #showExpiresBtn {
       margin-bottom: 20px;
-      background-color: #f39c12;
+      background-color: #3498db;
       color: white;
       border: none;
       border-radius: 5px;
+      padding: 10px 15px;
+      cursor: pointer;
+      margin-right: 10px;
     }
     .item {
       border: 1px solid #ddd;
@@ -187,8 +190,10 @@
 
   <input type="text" id="searchBox" placeholder="Search items by name, description, or location..." />
   
-  <!-- Share button stays outside the hamburger menu -->
+  <!-- Share and Show Expires buttons -->
   <button id="shareBtn">Share Records</button>
+  <button id="showExpiresBtn">Show Expires</button>
+  
   <!-- Hidden file input for import -->
   <input type="file" id="importInput" accept="application/json" style="display:none;" />
 
@@ -204,14 +209,22 @@
   </div>
 
   <script>
+    // Utility: Get today's date with time reset.
+    function getToday() {
+      const now = new Date();
+      return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    }
+
     // Retrieve saved items and locations from localStorage or initialize empty arrays.
     let items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
     let locations = JSON.parse(localStorage.getItem('inventoryLocations')) || [];
+    let showOnlyExpires = false; // Flag to toggle view
 
     const form = document.getElementById('itemForm');
     const itemsContainer = document.getElementById('itemsContainer');
     const searchBox = document.getElementById('searchBox');
     const shareBtn = document.getElementById('shareBtn');
+    const showExpiresBtn = document.getElementById('showExpiresBtn');
     const importInput = document.getElementById('importInput');
     const locationsList = document.getElementById('locationsList');
     const toggleFormBtn = document.getElementById('toggleFormBtn');
@@ -233,11 +246,22 @@
     // Function to display items, grouped by location.
     function displayItems() {
       const searchTerm = searchBox.value.toLowerCase();
-      const filteredItems = items.filter(item =>
+      let filteredItems = items.filter(item =>
         item.name.toLowerCase().includes(searchTerm) ||
         item.description.toLowerCase().includes(searchTerm) ||
         item.location.toLowerCase().includes(searchTerm)
       );
+      
+      // If toggled, filter only items that have an expire date either expired or expiring within 3 days.
+      if (showOnlyExpires) {
+        filteredItems = filteredItems.filter(item => {
+          if (!item.expireDate) return false;
+          const expireDate = new Date(item.expireDate);
+          const today = getToday();
+          const diffDays = Math.floor((expireDate - today) / (1000 * 60 * 60 * 24));
+          return diffDays < 0 || diffDays <= 3;
+        });
+      }
 
       // Group items by location.
       const groupedItems = {};
@@ -261,13 +285,30 @@
         groupedItems[location].forEach(item => {
           const itemDiv = document.createElement('div');
           itemDiv.className = 'item';
+          
+          // Determine expire date background if applicable.
+          let expireHTML = "";
+          if (item.expireDate) {
+            const expireDate = new Date(item.expireDate);
+            const today = getToday();
+            const diffDays = Math.floor((expireDate - today) / (1000 * 60 * 60 * 24));
+            let bgColor = "";
+            if (diffDays < 0) {
+              bgColor = "red";
+            } else if (diffDays <= 3) {
+              bgColor = "yellow";
+            }
+            // Using a small element with a background color.
+            expireHTML = `<br><small style="background-color: ${bgColor}; padding: 2px 5px; border-radius: 3px;">Expires on: ${expireDate.toLocaleDateString()}</small>`;
+          }
+          
           itemDiv.innerHTML = `
             <button onclick="deleteItem(${item.id})">Delete</button>
             <strong>${item.name}</strong><br>
             <em>${item.location}</em><br>
             <p>${item.description}</p>
             <small>Added on: ${new Date(item.addedDate).toLocaleString()}</small>
-            ${item.expireDate ? `<br><small>Expires on: ${new Date(item.expireDate).toLocaleDateString()}</small>` : ''}
+            ${expireHTML}
           `;
           itemsContainer.appendChild(itemDiv);
         });
@@ -392,6 +433,13 @@
       } else {
         alert('Web Share API is not supported in your browser.');
       }
+    });
+
+    // Toggle to show only expired/expiring items.
+    showExpiresBtn.addEventListener('click', function() {
+      showOnlyExpires = !showOnlyExpires;
+      showExpiresBtn.textContent = showOnlyExpires ? "Show All" : "Show Expires";
+      displayItems();
     });
 
     // Toggle form visibility when the + button is clicked.
