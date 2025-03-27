@@ -5,6 +5,12 @@
   <!-- Ensures proper scaling on mobile devices -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Home Inventory</title>
+  <!-- Firebase SDKs -->
+  <!-- <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js"></script> -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
   <style>
     html, body {
       height: 100%;
@@ -172,6 +178,8 @@
     <button id="exportBtn">Export Records</button>
     <button id="importBtn">Import Records</button>
     <button id="pasteBtn">Paste Records</button>
+    <!-- New Firebase Setup button -->
+    <button id="firebaseSetupBtn">Firebase Setup</button>
   </div>
 
   <form id="itemForm">
@@ -222,10 +230,24 @@
     window.addEventListener('resize', setVh);
     setVh();
 
-    // Utility: Get today's date with time reset.
-    function getToday() {
-      const now = new Date();
-      return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    // Initialize Firebase if API key is stored.
+    let firebaseConfigured = false;
+    let db = null;
+    const firebaseApiKey = localStorage.getItem('firebaseApiKey');
+
+    if (firebaseApiKey) {
+      const firebaseConfig = {
+      apiKey: firebaseApiKey,
+      authDomain: "homeinventory-4718c.firebaseapp.com",
+      projectId: "homeinventory-4718c",
+      storageBucket: "homeinventory-4718c.firebasestorage.app",
+      messagingSenderId: "719884896213",
+      appId: "1:719884896213:web:e93d5dffc79dec10995f5c"
+    };
+      firebase.initializeApp(firebaseConfig);
+      db = firebase.firestore();
+      firebaseConfigured = true;
+      console.log("Firebase initialized");
     }
 
     // Retrieve saved items and locations from localStorage or initialize empty arrays.
@@ -245,6 +267,7 @@
     const hamburgerMenu = document.getElementById('hamburgerMenu');
     const exportBtn = document.getElementById('exportBtn');
     const importBtn = document.getElementById('importBtn');
+    const firebaseSetupBtn = document.getElementById('firebaseSetupBtn');
 
     // Populate the datalist with stored locations.
     function updateLocationsList() {
@@ -328,11 +351,23 @@
       }
     }
 
+    // Utility: Get today's date with time reset.
+    function getToday() {
+      const now = new Date();
+      return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    }
+
     // Delete an item using its unique ID.
     function deleteItem(id) {
       items = items.filter(item => item.id !== id);
       localStorage.setItem('inventoryItems', JSON.stringify(items));
       displayItems();
+      // Optionally, you could also remove the item from Firebase here if configured.
+      if (firebaseConfigured && db) {
+        db.collection('inventoryItems').doc(id.toString()).delete()
+          .then(() => console.log("Item deleted from Firebase"))
+          .catch(error => console.error("Error deleting item from Firebase", error));
+      }
     }
 
     // Handle form submission to add a new item.
@@ -361,6 +396,14 @@
 
       items.push(newItem);
       localStorage.setItem('inventoryItems', JSON.stringify(items));
+      
+      // If Firebase is configured, also save the new item to Firebase Cloud Firestore.
+      if (firebaseConfigured && db) {
+        db.collection('inventoryItems').doc(newItem.id.toString()).set(newItem)
+          .then(() => console.log("Item saved to Firebase"))
+          .catch(error => console.error("Error saving item to Firebase", error));
+      }
+      
       form.reset();
       displayItems();
       // Automatically fold (hide) the form after submission.
@@ -477,6 +520,17 @@
     // Prevent clicks inside the form from closing it.
     form.addEventListener('click', function(e) {
       e.stopPropagation();
+    });
+
+    // Firebase Setup button: prompt user for API key.
+    firebaseSetupBtn.addEventListener('click', function(e) {
+      let apiKey = prompt("Enter your Firebase API Key:");
+      if (apiKey) {
+        localStorage.setItem('firebaseApiKey', apiKey);
+        alert("Firebase API key saved. Please refresh the page to initialize Firebase.");
+      }
+      // Hide hamburger menu after clicking.
+      hamburgerMenu.style.display = "none";
     });
 
     // Helper function to extract a valid JSON substring from a string.
