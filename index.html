@@ -226,9 +226,9 @@
           // <em>${item.location}</em><br>
           itemDiv.innerHTML = `
             <button onclick="deleteItem(${item.id})">Delete</button>
-            <strong>${item.name}</strong><br>
-            <p>${item.description}</p>
-            <small>Added on: ${new Date(item.addedDate).toLocaleString()}</small>
+            <strong>${item.name}</strong>
+            <small>Added on: ${new Date(item.addedDate).toLocaleDateString()}</small><br>
+            ${item.description ? `<p>${item.description}</p>` : ''}
             ${expireHTML}
           `;
           itemsContainer.appendChild(itemDiv);
