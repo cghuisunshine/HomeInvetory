@@ -5,23 +5,17 @@
   <!-- Ensures proper scaling on mobile devices -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Home Inventory</title>
-  <!-- Firebase SDKs -->
-  <!-- <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js"></script> -->
+  <!-- Firebase SDKs (using compat libraries to preserve global firebase variable) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
   <style>
-    html, body {
-      height: 100%;
-    }
+    html, body { height: 100%; }
     body {
       font-family: Arial, sans-serif;
       padding: 20px;
       max-width: 600px;
       margin: auto;
       position: relative;
-      /* Use the CSS variable to set the height */
       height: calc(var(--vh, 1vh) * 100);
     }
     h1 {
@@ -31,138 +25,49 @@
       justify-content: center;
       position: relative;
     }
-    h1 button {
-      font-size: 1.5em;
-      padding: 0 10px;
-      border: none;
-      background: none;
-      cursor: pointer;
-    }
-    /* Style for the Add Item (+) button */
-    #toggleFormBtn {
-      margin-left: 10px;
-    }
-    /* Style for the hamburger button */
-    #hamburgerBtn {
-      margin-left: 10px;
-      font-size: 1.5em;
-    }
-    /* Hamburger menu container */
+    h1 button { font-size: 1.5em; padding: 0 10px; border: none; background: none; cursor: pointer; }
+    #toggleFormBtn { margin-left: 10px; }
+    #hamburgerBtn { margin-left: 10px; font-size: 1.5em; }
     .hamburger-menu {
-      display: none;
-      position: absolute;
-      top: 50px;
-      right: 20px;
-      background: #fff;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      padding: 10px;
-      z-index: 1000;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      display: none; position: absolute; top: 50px; right: 20px;
+      background: #fff; border: 1px solid #ccc; border-radius: 5px; padding: 10px;
+      z-index: 1000; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
     .hamburger-menu button {
-      background-color: #3498db;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      padding: 10px 15px;
-      margin: 5px 0;
-      width: 100%;
-      cursor: pointer;
+      background-color: #3498db; color: white; border: none; border-radius: 5px;
+      padding: 10px 15px; margin: 5px 0; width: 100%; cursor: pointer;
     }
     form {
-      margin-bottom: 20px;
-      border: 1px solid #ccc;
-      padding: 15px;
-      border-radius: 5px;
-      display: none; /* folded by default */
+      margin-bottom: 20px; border: 1px solid #ccc; padding: 15px; border-radius: 5px;
+      display: none;
     }
-    label {
-      display: block;
-      margin-top: 10px;
-      font-weight: bold;
-    }
-    input, textarea, select {
-      width: 100%;
-      padding: 8px;
-      box-sizing: border-box;
-    }
-    button {
-      margin-top: 10px;
-      padding: 10px 15px;
-      cursor: pointer;
-    }
-    #searchBox {
-      width: 100%;
-      padding: 8px;
-      margin-bottom: 20px;
-      box-sizing: border-box;
-    }
-    /* Share and Show Expires buttons styling */
+    label { display: block; margin-top: 10px; font-weight: bold; }
+    input, textarea, select { width: 100%; padding: 8px; box-sizing: border-box; }
+    button { margin-top: 10px; padding: 10px 15px; cursor: pointer; }
+    #searchBox { width: 100%; padding: 8px; margin-bottom: 20px; box-sizing: border-box; }
     #shareBtn, #showExpiresBtn {
-      margin-bottom: 20px;
-      background-color: #3498db;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      padding: 10px 15px;
-      cursor: pointer;
-      margin-right: 10px;
+      margin-bottom: 20px; background-color: #3498db; color: white; border: none;
+      border-radius: 5px; padding: 10px 15px; cursor: pointer; margin-right: 10px;
     }
     .item {
-      border: 1px solid #ddd;
-      padding: 10px;
-      margin: 5px 0 15px 15px;
-      border-radius: 5px;
+      border: 1px solid #ddd; padding: 10px; margin: 5px 0 15px 15px; border-radius: 5px;
       position: relative;
     }
-    .item strong {
-      font-size: 1.1em;
-    }
+    .item strong { font-size: 1.1em; }
     .item button {
-      background-color: #e74c3c;
-      color: white;
-      border: none;
-      padding: 5px 10px;
-      border-radius: 3px;
-      position: absolute;
-      right: 10px;
-      top: 10px;
-      cursor: pointer;
+      background-color: #e74c3c; color: white; border: none; padding: 5px 10px;
+      border-radius: 3px; position: absolute; right: 10px; top: 10px; cursor: pointer;
     }
-    /* Location header styling */
     .location-header {
-      margin-top: 20px;
-      margin-bottom: 5px;
-      padding-left: 10px;
-      border-left: 3px solid #3498db;
-      font-size: 1.2em;
-      font-weight: bold;
+      margin-top: 20px; margin-bottom: 5px; padding-left: 10px;
+      border-left: 3px solid #3498db; font-size: 1.2em; font-weight: bold;
     }
-    /* Responsive styles for mobile devices */
-    @media (max-width: 600px) {
-      body {
-        padding: 10px;
-      }
-      /* Remove left margin for hamburger menu when on small screens */
-      #hamburgerBtn {
-        margin-left: 0;
-      }
-    }
-    /* Styles for the Paste JSON modal */
+    @media (max-width: 600px) { body { padding: 10px; } #hamburgerBtn { margin-left: 0; } }
     #pasteModal {
-      display: none; 
-      position: fixed; 
-      top: 50%; 
-      left: 50%; 
-      transform: translate(-50%, -50%);
-      background: #fff; 
-      border: 1px solid #ccc; 
-      padding: 20px; 
-      z-index: 2000; 
-      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-      max-width: 90%;
-      width: 400px;
+      display: none; position: fixed; top: 50%; left: 50%;
+      transform: translate(-50%, -50%); background: #fff; border: 1px solid #ccc;
+      padding: 20px; z-index: 2000; box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      max-width: 90%; width: 400px;
     }
   </style>
 </head>
@@ -178,7 +83,7 @@
     <button id="exportBtn">Export Records</button>
     <button id="importBtn">Import Records</button>
     <button id="pasteBtn">Paste Records</button>
-    <!-- New Firebase Setup button -->
+    <!-- Firebase Setup button (does not store items; only the key) -->
     <button id="firebaseSetupBtn">Firebase Setup</button>
   </div>
 
@@ -190,11 +95,9 @@
     <textarea id="description" rows="3"></textarea>
 
     <label for="location">Location:</label>
-    <!-- Use datalist for suggestions -->
     <input type="text" id="location" list="locationsList" required />
     <datalist id="locationsList"></datalist>
 
-    <!-- Optional Expire Date field with a date picker -->
     <label for="expireDate">Expire Date (optional):</label>
     <input type="date" id="expireDate" />
 
@@ -203,16 +106,13 @@
 
   <input type="text" id="searchBox" placeholder="Search items by name, description, or location..." />
   
-  <!-- Share and Show Expires buttons -->
   <button id="shareBtn">Share Records</button>
   <button id="showExpiresBtn">Show Expires</button>
   
-  <!-- Hidden file input for import -->
   <input type="file" id="importInput" accept="application/json" style="display:none;" />
 
   <div id="itemsContainer"></div>
 
-  <!-- Paste JSON Modal -->
   <div id="pasteModal">
     <h3>Paste Records</h3>
     <textarea id="pasteJsonInput" rows="10" style="width: 100%;"></textarea>
@@ -222,7 +122,7 @@
   </div>
 
   <script>
-    // Set CSS variable for viewport height to handle mobile keyboards.
+    // Set CSS variable for viewport height.
     function setVh() {
       let vh = window.innerHeight * 0.01;
       document.documentElement.style.setProperty('--vh', `${vh}px`);
@@ -230,30 +130,29 @@
     window.addEventListener('resize', setVh);
     setVh();
 
-    // Initialize Firebase if API key is stored.
+    // Firebase initialization (if API key is set in localStorage)
     let firebaseConfigured = false;
     let db = null;
     const firebaseApiKey = localStorage.getItem('firebaseApiKey');
-
     if (firebaseApiKey) {
       const firebaseConfig = {
-      apiKey: firebaseApiKey,
-      authDomain: "homeinventory-4718c.firebaseapp.com",
-      projectId: "homeinventory-4718c",
-      storageBucket: "homeinventory-4718c.firebasestorage.app",
-      messagingSenderId: "719884896213",
-      appId: "1:719884896213:web:e93d5dffc79dec10995f5c"
-    };
+        apiKey: firebaseApiKey,
+        authDomain: "homeinventory-4718c.firebaseapp.com",
+        projectId: "homeinventory-4718c",
+        storageBucket: "homeinventory-4718c.firebasestorage.app",
+        messagingSenderId: "719884896213",
+        appId: "1:719884896213:web:e93d5dffc79dec10995f5c"
+      };
       firebase.initializeApp(firebaseConfig);
       db = firebase.firestore();
       firebaseConfigured = true;
       console.log("Firebase initialized");
     }
 
-    // Retrieve saved items and locations from localStorage or initialize empty arrays.
+    // Local data
     let items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
     let locations = JSON.parse(localStorage.getItem('inventoryLocations')) || [];
-    let showOnlyExpires = false; // Flag to toggle view
+    let showOnlyExpires = false; // Toggle flag
 
     const form = document.getElementById('itemForm');
     const itemsContainer = document.getElementById('itemsContainer');
@@ -269,7 +168,7 @@
     const importBtn = document.getElementById('importBtn');
     const firebaseSetupBtn = document.getElementById('firebaseSetupBtn');
 
-    // Populate the datalist with stored locations.
+    // Update locations datalist
     function updateLocationsList() {
       locationsList.innerHTML = '';
       locations.forEach(loc => {
@@ -279,7 +178,7 @@
       });
     }
 
-    // Function to display items, grouped by location.
+    // Display items from the items array (from localStorage)
     function displayItems() {
       const searchTerm = searchBox.value.toLowerCase();
       let filteredItems = items.filter(item =>
@@ -288,7 +187,6 @@
         item.location.toLowerCase().includes(searchTerm)
       );
       
-      // If toggled, filter only items that have an expire date either expired or expiring within 3 days.
       if (showOnlyExpires) {
         filteredItems = filteredItems.filter(item => {
           if (!item.expireDate) return false;
@@ -298,46 +196,32 @@
           return diffDays < 0 || diffDays <= 3;
         });
       }
-
+      
       // Group items by location.
       const groupedItems = {};
       filteredItems.forEach(item => {
         const loc = item.location;
-        if (!groupedItems[loc]) {
-          groupedItems[loc] = [];
-        }
+        if (!groupedItems[loc]) { groupedItems[loc] = []; }
         groupedItems[loc].push(item);
       });
-
+      
       itemsContainer.innerHTML = '';
-      // For each location, create a header and list items.
       for (const location in groupedItems) {
-        // Create a header for this location.
         const header = document.createElement('div');
         header.className = "location-header";
         header.textContent = location;
         itemsContainer.appendChild(header);
-
         groupedItems[location].forEach(item => {
           const itemDiv = document.createElement('div');
           itemDiv.className = 'item';
-          
-          // Determine expire date background if applicable.
           let expireHTML = "";
           if (item.expireDate) {
             const expireDate = new Date(item.expireDate);
             const today = getToday();
             const diffDays = Math.floor((expireDate - today) / (1000 * 60 * 60 * 24));
-            let bgColor = "";
-            if (diffDays < 0) {
-              bgColor = "red";
-            } else if (diffDays <= 3) {
-              bgColor = "yellow";
-            }
-            // Using a small element with a background color.
+            let bgColor = (diffDays < 0) ? "red" : (diffDays <= 3) ? "yellow" : "";
             expireHTML = `<br><small style="background-color: ${bgColor}; padding: 2px 5px; border-radius: 3px;">Expires on: ${expireDate.toLocaleDateString()}</small>`;
           }
-          
           itemDiv.innerHTML = `
             <button onclick="deleteItem(${item.id})">Delete</button>
             <strong>${item.name}</strong><br>
@@ -351,45 +235,40 @@
       }
     }
 
-    // Utility: Get today's date with time reset.
+    // Utility: Today's date with time reset.
     function getToday() {
       const now = new Date();
       return new Date(now.getFullYear(), now.getMonth(), now.getDate());
     }
 
-    // Delete an item using its unique ID.
+    // Delete an item from both localStorage and Firebase.
     function deleteItem(id) {
       items = items.filter(item => item.id !== id);
       localStorage.setItem('inventoryItems', JSON.stringify(items));
       displayItems();
-      // Optionally, you could also remove the item from Firebase here if configured.
       if (firebaseConfigured && db) {
         db.collection('inventoryItems').doc(id.toString()).delete()
           .then(() => console.log("Item deleted from Firebase"))
           .catch(error => console.error("Error deleting item from Firebase", error));
       }
     }
+    window.deleteItem = deleteItem; // Expose for inline onclick
 
     // Handle form submission to add a new item.
     form.addEventListener('submit', function(e) {
       e.preventDefault();
-      const itemName = document.getElementById('name').value;
-      const itemDescription = document.getElementById('description').value;
-      const itemLocation = document.getElementById('location').value;
-      const itemExpireDate = document.getElementById('expireDate').value;
-
       const newItem = {
-        id: Date.now(), // Use timestamp as a simple unique ID.
-        name: itemName,
-        description: itemDescription,
-        location: itemLocation,
+        id: Date.now(),
+        name: document.getElementById('name').value,
+        description: document.getElementById('description').value,
+        location: document.getElementById('location').value,
         addedDate: new Date().toISOString(),
-        expireDate: itemExpireDate ? new Date(itemExpireDate).toISOString() : null
+        expireDate: document.getElementById('expireDate').value ? new Date(document.getElementById('expireDate').value).toISOString() : null
       };
 
-      // If the location is new, add it to the locations array.
-      if (!locations.includes(itemLocation)) {
-        locations.push(itemLocation);
+      // Update locations if new
+      if (!locations.includes(newItem.location)) {
+        locations.push(newItem.location);
         localStorage.setItem('inventoryLocations', JSON.stringify(locations));
         updateLocationsList();
       }
@@ -397,7 +276,7 @@
       items.push(newItem);
       localStorage.setItem('inventoryItems', JSON.stringify(items));
       
-      // If Firebase is configured, also save the new item to Firebase Cloud Firestore.
+      // Also save to Firebase if configured.
       if (firebaseConfigured && db) {
         db.collection('inventoryItems').doc(newItem.id.toString()).set(newItem)
           .then(() => console.log("Item saved to Firebase"))
@@ -406,14 +285,13 @@
       
       form.reset();
       displayItems();
-      // Automatically fold (hide) the form after submission.
       form.style.display = "none";
     });
 
-    // Update displayed items as the search query changes.
+    // When search input changes, update displayed items.
     searchBox.addEventListener('input', displayItems);
 
-    // Export records as a JSON file.
+    // Export, import, paste JSON code (unchanged)
     exportBtn.addEventListener('click', function() {
       const dataStr = JSON.stringify(items, null, 2);
       const blob = new Blob([dataStr], { type: "application/json" });
@@ -425,34 +303,30 @@
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      // Hide hamburger menu after clicking.
       hamburgerMenu.style.display = "none";
     });
 
-    // Trigger the hidden file input when Import Records button is clicked.
     importBtn.addEventListener('click', function() {
       importInput.click();
-      // Hide hamburger menu after clicking.
       hamburgerMenu.style.display = "none";
     });
 
-    // Process the selected file and merge imported records.
     importInput.addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (!file) return;
-
       const reader = new FileReader();
       reader.onload = function(event) {
         try {
-          // Directly parse file content (expected to be valid JSON).
           const importedItems = JSON.parse(event.target.result);
-          // Merge imported items (skip duplicates based on id)
           importedItems.forEach(importedItem => {
             if (!items.find(item => item.id === importedItem.id)) {
               items.push(importedItem);
-              // Also add the location if it's not already in our locations list.
               if (importedItem.location && !locations.includes(importedItem.location)) {
                 locations.push(importedItem.location);
+              }
+              if (firebaseConfigured && db) {
+                db.collection('inventoryItems').doc(importedItem.id.toString()).set(importedItem)
+                  .catch(error => console.error("Error saving imported item to Firebase", error));
               }
             }
           });
@@ -466,11 +340,10 @@
         }
       };
       reader.readAsText(file);
-      // Clear the file input value to allow re-importing if needed.
       e.target.value = "";
     });
 
-    // Share displayed records using the Web Share API.
+    // Paste JSON modal handling (unchanged)
     shareBtn.addEventListener('click', function() {
       const searchTerm = searchBox.value.toLowerCase();
       const filteredItems = items.filter(item =>
@@ -478,109 +351,85 @@
         item.description.toLowerCase().includes(searchTerm) ||
         item.location.toLowerCase().includes(searchTerm)
       );
-      
       if (navigator.share) {
         navigator.share({
           title: 'Home Inventory Records',
           text: JSON.stringify(filteredItems, null, 2)
-        })
-        .then(() => console.log('Records shared successfully'))
-        .catch((error) => console.error('Error sharing:', error));
+        }).then(() => console.log('Records shared successfully'))
+          .catch(error => console.error('Error sharing:', error));
       } else {
         alert('Web Share API is not supported in your browser.');
       }
     });
 
-    // Toggle to show only expired/expiring items.
     showExpiresBtn.addEventListener('click', function() {
       showOnlyExpires = !showOnlyExpires;
       showExpiresBtn.textContent = showOnlyExpires ? "Show All" : "Show Expires";
       displayItems();
     });
 
-    // Toggle form visibility when the + button is clicked.
     toggleFormBtn.addEventListener('click', function(e) {
       e.stopPropagation();
       form.style.display = (form.style.display === "none" || form.style.display === "") ? "block" : "none";
     });
 
-    // Toggle hamburger menu visibility when its button is clicked.
     hamburgerBtn.addEventListener('click', function(e) {
       e.stopPropagation();
       hamburgerMenu.style.display = (hamburgerMenu.style.display === "none" || hamburgerMenu.style.display === "") ? "block" : "none";
     });
 
-    // Hide the hamburger menu if clicked outside of it.
     document.addEventListener('click', function(e) {
       if (hamburgerMenu.style.display === "block" && !hamburgerMenu.contains(e.target) && e.target !== hamburgerBtn) {
         hamburgerMenu.style.display = "none";
       }
     });
+    form.addEventListener('click', function(e) { e.stopPropagation(); });
 
-    // Prevent clicks inside the form from closing it.
-    form.addEventListener('click', function(e) {
-      e.stopPropagation();
-    });
-
-    // Firebase Setup button: prompt user for API key.
     firebaseSetupBtn.addEventListener('click', function(e) {
       let apiKey = prompt("Enter your Firebase API Key:");
       if (apiKey) {
         localStorage.setItem('firebaseApiKey', apiKey);
         alert("Firebase API key saved. Please refresh the page to initialize Firebase.");
       }
-      // Hide hamburger menu after clicking.
       hamburgerMenu.style.display = "none";
     });
 
-    // Helper function to extract a valid JSON substring from a string.
     function extractValidJSON(text) {
-      // Look for the first occurrence of '[' and the last occurrence of ']'
       let start = text.indexOf('[');
       let end = text.lastIndexOf(']');
-      if (start !== -1 && end !== -1 && end > start) {
-        return text.substring(start, end + 1);
-      }
-      // If not found, try for an object
+      if (start !== -1 && end !== -1 && end > start) { return text.substring(start, end + 1); }
       start = text.indexOf('{');
       end = text.lastIndexOf('}');
-      if (start !== -1 && end !== -1 && end > start) {
-        return text.substring(start, end + 1);
-      }
+      if (start !== -1 && end !== -1 && end > start) { return text.substring(start, end + 1); }
       return null;
     }
 
-    // Get modal elements for pasted JSON.
     const pasteModal = document.getElementById('pasteModal');
     const pasteJsonInput = document.getElementById('pasteJsonInput');
     const pasteImportBtn = document.getElementById('pasteImportBtn');
     const closeModalBtn = document.getElementById('closeModalBtn');
     const pasteBtn = document.getElementById('pasteBtn');
 
-    // Show the modal when Paste JSON button is clicked.
     pasteBtn.addEventListener('click', function() {
       pasteModal.style.display = "block";
-      hamburgerMenu.style.display = "none"; // Hide hamburger menu if open.
+      hamburgerMenu.style.display = "none";
     });
 
-    // When the user clicks the Import JSON button in the modal.
     pasteImportBtn.addEventListener('click', function() {
       let pastedText = pasteJsonInput.value;
-      // Extract valid JSON substring.
       let jsonText = extractValidJSON(pastedText);
-      if (!jsonText) {
-        alert("No valid JSON found in the input.");
-        return;
-      }
+      if (!jsonText) { alert("No valid JSON found in the input."); return; }
       try {
         const importedItems = JSON.parse(jsonText);
-        // Merge imported items (skip duplicates based on id)
         importedItems.forEach(importedItem => {
           if (!items.find(item => item.id === importedItem.id)) {
             items.push(importedItem);
-            // Also add the location if it's not already in our locations list.
             if (importedItem.location && !locations.includes(importedItem.location)) {
               locations.push(importedItem.location);
+            }
+            if (firebaseConfigured && db) {
+              db.collection('inventoryItems').doc(importedItem.id.toString()).set(importedItem)
+                .catch(error => console.error("Error saving imported item to Firebase", error));
             }
           }
         });
@@ -589,25 +438,39 @@
         updateLocationsList();
         displayItems();
         alert("Records imported successfully!");
-        pasteModal.style.display = "none"; // Close modal on success.
-        pasteJsonInput.value = ""; // Clear textarea.
+        pasteModal.style.display = "none";
+        pasteJsonInput.value = "";
       } catch (error) {
         alert("Failed to import records: Invalid JSON format.");
       }
     });
 
-    // Close the modal when the Close button is clicked.
     closeModalBtn.addEventListener('click', function() {
       pasteModal.style.display = "none";
-      pasteJsonInput.value = ""; // Clear the textarea.
+      pasteJsonInput.value = "";
     });
 
-    // Show items and update locations list on page load.
+    // On page load, if Firebase is configured, load items from Firestore;
+    // otherwise use localStorage.
     updateLocationsList();
-    displayItems();
-
-    // Expose deleteItem to global scope for inline onclick in HTML.
-    window.deleteItem = deleteItem;
+    if (firebaseConfigured && db) {
+      db.collection('inventoryItems').get()
+        .then(querySnapshot => {
+          items = []; // Reset items array
+          querySnapshot.forEach(doc => {
+            items.push(doc.data());
+          });
+          localStorage.setItem('inventoryItems', JSON.stringify(items));
+          displayItems();
+          console.log("Loaded items from Firebase");
+        })
+        .catch(error => {
+          console.error("Error fetching items from Firebase", error);
+          displayItems(); // Fallback to localstorage items
+        });
+    } else {
+      displayItems();
+    }
   </script>
 </body>
 </html>
