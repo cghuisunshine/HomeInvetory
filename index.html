@@ -222,10 +222,11 @@
             let bgColor = (diffDays < 0) ? "red" : (diffDays <= 3) ? "yellow" : "";
             expireHTML = `<br><small style="background-color: ${bgColor}; padding: 2px 5px; border-radius: 3px;">Expires on: ${expireDate.toLocaleDateString()}</small>`;
           }
+
+          // <em>${item.location}</em><br>
           itemDiv.innerHTML = `
             <button onclick="deleteItem(${item.id})">Delete</button>
             <strong>${item.name}</strong><br>
-            <em>${item.location}</em><br>
             <p>${item.description}</p>
             <small>Added on: ${new Date(item.addedDate).toLocaleString()}</small>
             ${expireHTML}
