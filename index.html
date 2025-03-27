@@ -220,16 +220,17 @@
             const today = getToday();
             const diffDays = Math.floor((expireDate - today) / (1000 * 60 * 60 * 24));
             let bgColor = (diffDays < 0) ? "red" : (diffDays <= 3) ? "yellow" : "";
-            expireHTML = `<br><small style="background-color: ${bgColor}; padding: 2px 5px; border-radius: 3px;">Expires on: ${expireDate.toLocaleDateString()}</small>`;
+            expireHTML = `<small style="background-color: ${bgColor}; padding: 2px 5px; border-radius: 3px;">Expires on: ${expireDate.toLocaleDateString()}</small>`;
           }
 
           // <em>${item.location}</em><br>
           itemDiv.innerHTML = `
             <button onclick="deleteItem(${item.id})">Delete</button>
             <strong>${item.name}</strong>
-            <small>Added on: ${new Date(item.addedDate).toLocaleDateString()}</small><br>
-            ${item.description ? `<p>${item.description}</p>` : ''}
+            <small>Added on: ${new Date(item.addedDate).toLocaleDateString()}</small>
             ${expireHTML}
+            ${item.description ? `<br> <p>${item.description}</p>` : ''}
+            
           `;
           itemsContainer.appendChild(itemDiv);
         });
