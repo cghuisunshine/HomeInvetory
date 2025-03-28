@@ -94,6 +94,10 @@
     <label for="description">Description:</label>
     <textarea id="description" rows="3"></textarea>
 
+    <!-- Optional Quantity Field -->
+    <label for="quantity">Quantity (optional):</label>
+    <input type="number" id="quantity" min="0" />
+
     <label for="location">Location:</label>
     <input type="text" id="location" list="locationsList" required />
     <datalist id="locationsList"></datalist>
@@ -222,14 +226,17 @@
             expireHTML = `<small style="background-color: ${bgColor}; padding: 2px 5px; border-radius: 3px;">${expireDate.toLocaleDateString()}</small>`;
           }
 
-          // <em>${item.location}</em><br>
+          // Display quantity if available
+          const quantityHTML = item.quantity !== null && item.quantity !== undefined && item.quantity !== "" 
+            ? `<span style="margin-left: 5px;">(Qty: ${item.quantity})</span>` 
+            : "";
+
           itemDiv.innerHTML = `
             <button onclick="deleteItem(${item.id})">Delete</button>
-            <strong>${item.name}</strong>
+            <strong>${item.name}</strong> ${quantityHTML}
             <small>${new Date(item.addedDate).toLocaleDateString()} - </small>
             ${expireHTML}
-            ${item.description ? `<br> <p>${item.description}</p>` : ''}
-            
+            ${item.description ? `<br><p>${item.description}</p>` : ''}
           `;
           itemsContainer.appendChild(itemDiv);
         });
@@ -258,10 +265,13 @@
     // Handle form submission to add a new item.
     form.addEventListener('submit', function(e) {
       e.preventDefault();
+      const quantityValue = document.getElementById('quantity').value;
       const newItem = {
         id: Date.now(),
         name: document.getElementById('name').value,
         description: document.getElementById('description').value,
+        // Save quantity as a number if provided, otherwise null.
+        quantity: quantityValue ? Number(quantityValue) : null,
         location: document.getElementById('location').value,
         addedDate: new Date().toISOString(),
         expireDate: document.getElementById('expireDate').value ? new Date(document.getElementById('expireDate').value).toISOString() : null
@@ -475,4 +485,3 @@
   </script>
 </body>
 </html>
-
