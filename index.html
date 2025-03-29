@@ -98,7 +98,6 @@
       padding: 8px;
       box-sizing: border-box;
     }
-
     /* Remove bottom margin from #searchBox since it's in .search-row */
     #searchBox {
       width: 100%;
@@ -179,7 +178,6 @@
   <div id="hamburgerMenu" class="hamburger-menu">
     <button id="exportBtn">Export Records</button>
     <button id="importBtn">Import Records</button>
-    <button id="shareBtn" >Share Records</button>
     <button id="pasteBtn">Paste Records</button>
     <!-- Firebase Setup button (does not store items; only the key) -->
     <button id="firebaseSetupBtn">Firebase Setup</button>
@@ -334,7 +332,7 @@
             : "";
 
           itemDiv.innerHTML = `
-            <button onclick="deleteItem(${item.id})">Delete</button>
+            <button onclick="deleteItem(${item.id})">X</button>
             <strong>${item.name}</strong> ${quantityHTML}
             <small>${new Date(item.addedDate).toLocaleDateString()} - </small>
             ${expireHTML}
