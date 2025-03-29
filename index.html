@@ -9,7 +9,9 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <style>
-    html, body { height: 100%; }
+    html, body {
+      height: 100%;
+    }
     body {
       font-family: Arial, sans-serif;
       padding: 20px;
@@ -25,49 +27,144 @@
       justify-content: center;
       position: relative;
     }
-    h1 button { font-size: 1.5em; padding: 0 10px; border: none; background: none; cursor: pointer; }
-    #toggleFormBtn { margin-left: 10px; }
-    #hamburgerBtn { margin-left: 10px; font-size: 1.5em; }
+    h1 button {
+      font-size: 1.5em;
+      padding: 0 10px;
+      border: none;
+      background: none;
+      cursor: pointer;
+    }
+    #toggleFormBtn {
+      margin-left: 10px;
+    }
+    #hamburgerBtn {
+      margin-left: 10px;
+      font-size: 1.5em;
+    }
     .hamburger-menu {
-      display: none; position: absolute; top: 50px; right: 20px;
-      background: #fff; border: 1px solid #ccc; border-radius: 5px; padding: 10px;
-      z-index: 1000; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      display: none;
+      position: absolute;
+      top: 50px;
+      right: 20px;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 10px;
+      z-index: 1000;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
     .hamburger-menu button {
-      background-color: #3498db; color: white; border: none; border-radius: 5px;
-      padding: 10px 15px; margin: 5px 0; width: 100%; cursor: pointer;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 10px 15px;
+      margin: 5px 0;
+      width: 100%;
+      cursor: pointer;
     }
     form {
-      margin-bottom: 20px; border: 1px solid #ccc; padding: 15px; border-radius: 5px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      padding: 15px;
+      border-radius: 5px;
       display: none;
     }
-    label { display: block; margin-top: 10px; font-weight: bold; }
-    input, textarea, select { width: 100%; padding: 8px; box-sizing: border-box; }
-    button { margin-top: 10px; padding: 10px 15px; cursor: pointer; }
-    #searchBox { width: 100%; padding: 8px; margin-bottom: 20px; box-sizing: border-box; }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    input, textarea, select {
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px 15px;
+      cursor: pointer;
+    }
+
+    /* New container for search input and show-expires button */
+    .search-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .search-row input {
+      flex: 1;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+
+    /* Remove bottom margin from #searchBox since it's in .search-row */
+    #searchBox {
+      width: 100%;
+      box-sizing: border-box;
+      margin-bottom: 0;
+    }
+    
     #shareBtn, #showExpiresBtn {
-      margin-bottom: 20px; background-color: #3498db; color: white; border: none;
-      border-radius: 5px; padding: 10px 15px; cursor: pointer; margin-right: 10px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 10px 15px;
+      cursor: pointer;
+      margin-right: 10px;
     }
     .item {
-      border: 1px solid #ddd; padding: 10px; margin: 5px 0 15px 15px; border-radius: 5px;
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin: 5px 0 15px 15px;
+      border-radius: 5px;
       position: relative;
     }
-    .item strong { font-size: 1.1em; }
+    .item strong {
+      font-size: 1.1em;
+    }
     .item button {
-      background-color: #e74c3c; color: white; border: none; padding: 5px 10px;
-      border-radius: 3px; position: absolute; right: 10px; top: 10px; cursor: pointer;
+      background-color: #e74c3c;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 3px;
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      cursor: pointer;
     }
     .location-header {
-      margin-top: 20px; margin-bottom: 5px; padding-left: 10px;
-      border-left: 3px solid #3498db; font-size: 1.2em; font-weight: bold;
+      margin-top: 20px;
+      margin-bottom: 5px;
+      padding-left: 10px;
+      border-left: 3px solid #3498db;
+      font-size: 1.2em;
+      font-weight: bold;
     }
-    @media (max-width: 600px) { body { padding: 10px; } #hamburgerBtn { margin-left: 0; } }
+    @media (max-width: 600px) {
+      body {
+        padding: 10px;
+      }
+      #hamburgerBtn {
+        margin-left: 0;
+      }
+    }
     #pasteModal {
-      display: none; position: fixed; top: 50%; left: 50%;
-      transform: translate(-50%, -50%); background: #fff; border: 1px solid #ccc;
-      padding: 20px; z-index: 2000; box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-      max-width: 90%; width: 400px;
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #fff;
+      border: 1px solid #ccc;
+      padding: 20px;
+      z-index: 2000;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      max-width: 90%;
+      width: 400px;
     }
   </style>
 </head>
@@ -108,10 +205,14 @@
     <button type="submit">Add Item</button>
   </form>
 
-  <input type="text" id="searchBox" placeholder="Search by name, description, or location..." />
-  <button id="shareBtn" style="display: none;" >Share Records</button>
-  <button id="showExpiresBtn">Show Expires</button>
-  
+  <!-- The search input and 'Show Expires' button on the same row -->
+  <div class="search-row">
+    <input type="text" id="searchBox" placeholder="Search by name, description, or location..." />
+    <button id="showExpiresBtn">Show Expires</button>
+  </div>
+  <!-- Share button remains separate -->
+  <button id="shareBtn" style="display: none;">Share Records</button>
+
   <input type="file" id="importInput" accept="application/json" style="display:none;" />
 
   <div id="itemsContainer"></div>
@@ -302,7 +403,7 @@
     // When search input changes, update displayed items.
     searchBox.addEventListener('input', displayItems);
 
-    // Export, import, paste JSON code (unchanged)
+    // Export, import, paste JSON code
     exportBtn.addEventListener('click', function() {
       const dataStr = JSON.stringify(items, null, 2);
       const blob = new Blob([dataStr], { type: "application/json" });
@@ -354,7 +455,7 @@
       e.target.value = "";
     });
 
-    // Paste JSON modal handling (unchanged)
+    // Paste JSON modal handling
     shareBtn.addEventListener('click', function() {
       const searchTerm = searchBox.value.toLowerCase();
       const filteredItems = items.filter(item =>
@@ -408,10 +509,14 @@
     function extractValidJSON(text) {
       let start = text.indexOf('[');
       let end = text.lastIndexOf(']');
-      if (start !== -1 && end !== -1 && end > start) { return text.substring(start, end + 1); }
+      if (start !== -1 && end !== -1 && end > start) {
+        return text.substring(start, end + 1);
+      }
       start = text.indexOf('{');
       end = text.lastIndexOf('}');
-      if (start !== -1 && end !== -1 && end > start) { return text.substring(start, end + 1); }
+      if (start !== -1 && end !== -1 && end > start) {
+        return text.substring(start, end + 1);
+      }
       return null;
     }
 
@@ -429,7 +534,10 @@
     pasteImportBtn.addEventListener('click', function() {
       let pastedText = pasteJsonInput.value;
       let jsonText = extractValidJSON(pastedText);
-      if (!jsonText) { alert("No valid JSON found in the input."); return; }
+      if (!jsonText) {
+        alert("No valid JSON found in the input.");
+        return;
+      }
       try {
         const importedItems = JSON.parse(jsonText);
         importedItems.forEach(importedItem => {
